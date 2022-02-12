@@ -90,7 +90,7 @@ def main(clips_dir):
     print(words.split())
     print(sounds)
 
-    out = AudioSegment.silent(0)
+    out = AudioSegment.empty()
     for s in sounds:
         i = 0
         while i < len(s):

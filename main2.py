@@ -1,5 +1,13 @@
-import eng_to_ipa
+#!/usr/bin/env python 
+
+import sys
+
+sys.path.append(
+    "c:\\users\\rzn31\\appdata\\local\\programs\\python\\python38-32\\lib\\site-packages")
+
+
 from pydub import AudioSegment, effects
+import eng_to_ipa
 from pydub.playback import play
 
 
@@ -74,51 +82,57 @@ double_letters = {
 }
 
 
-def main(clips_dir):
-    words = input()
+def main(clips_dir, username):
+    words = sys.argv[2]
 
     sounds = phrase_to_sound(words)
     print(words.split())
-    print(sounds)
 
-    overlap = 20
+    print('eoifoweifj')
 
     out = AudioSegment.empty()
     ploc = 0
     loc = 0
-    for s in sounds:
-        i = 0
-        while i < len(s):
-            sound_file = None
-            if i < len(s) - 1 and s[i:i+2] in double_letters:
-                sound_file = clips_dir + "/" + double_letters.get(s[i:i+2])
-                i += 2
-            else:
-                c = s[i]
-                if c in file_map:
-                    sound_file = clips_dir + "/" + file_map.get(c, "")
-                i += 1
-            if sound_file is not None:
-                sound = AudioSegment.from_file(sound_file)
-                sound = trim_silence(effects.normalize(sound))
-                prevlen = loc - ploc
-                minlen = min(min(prevlen, len(sound)) // 2, 50)
-                if minlen > loc:
-                    minlen = loc
-                out += AudioSegment.silent(len(sound) - minlen)
-                out = out.overlay(sound, loc - minlen)
+    try:
+        for s in sounds:
+            i = 0
+            while i < len(s):
+                sound_file = None
+                if i < len(s) - 1 and s[i:i+2] in double_letters:
+                    sound_file = clips_dir + "/" + username + \
+                        "/" + double_letters.get(s[i:i+2])
+                    i += 2
+                else:
+                    c = s[i]
+                    if c in file_map:
+                        sound_file = clips_dir + "/" + \
+                            username + "/" + file_map.get(c, "")
+                    i += 1
+                if sound_file is not None:
+                    sound = AudioSegment.from_file(sound_file)
+                    sound = trim_silence(effects.normalize(sound))
+                    prevlen = loc - ploc
+                    minlen = min(min(prevlen, len(sound)) // 2, 50)
+                    if minlen > loc:
+                        minlen = loc
+                    out += AudioSegment.silent(len(sound) - minlen)
+                    out = out.overlay(sound, loc - minlen)
+                    ploc = loc
+                    loc += len(sound) - minlen
+            if s[-1] == ".":
+                loc += 200
                 ploc = loc
-                loc += len(sound) - minlen
-        if s[-1] == ".":
-            loc += 200
+                out += AudioSegment.silent(200)
+            loc += 40
             ploc = loc
-            out += AudioSegment.silent(200)
-        loc += 40
-        ploc = loc
-        out += AudioSegment.silent(40)
+            out += AudioSegment.silent(40)
 
-    play(out)
+        # play(out)
+
+        out.export(clips_dir + "/" + username + "/out.mp3")
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":
-    main("c:/Users/rzn31/projects/hackbeanpot/clips")
+    main("c:/Users/rzn31/projects/hackbeanpot/clips", sys.argv[1])

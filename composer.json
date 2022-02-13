@@ -1,0 +1,17 @@
+{
+    "name": "rzn31/hackbeanpot",
+    "autoload": {
+        "psr-4": {
+            "Rzn31\\Hackbeanpot\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ross Newman",
+            "email": "rzn3102@gmail.com"
+        }
+    ],
+    "require": {
+        "delight-im/auth": "^8.3"
+    }
+}

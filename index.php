@@ -1,4 +1,5 @@
 <?php
+Header("Cache-Control: max-age=3000, must-revalidate");
 
 $action = filter_input(INPUT_GET, "action");
 if (!isset($action)) {
@@ -59,11 +60,20 @@ switch ($action) {
         include "view.php";
         break;
     case "save_sound":
-        header("Content-Type: application/json");
-        echo json_encode(array("r" => filter_input(INPUT_POST, "action")));
-        exit();
+        // header("Content-Type", "application/json");
+        $file_name = filter_input(INPUT_POST, "filename");
+        $name = filter_input(INPUT_POST, "name");
+        $blob = $_FILES["sound"];
+
+        if (!file_exists('clips/' . $name)) {
+            mkdir('clips/' . $name, 0777, true);
+        }
+
+        copy($blob["tmp_name"], "./clips/" . $name . "/" . $file_name);
+        break;
     case "tutorial":
         $completion = filter_input(INPUT_GET, "completion");
+        $name = filter_input(INPUT_GET, "name");
         if (!isset($completion)) {
             $completion = 0;
         }
@@ -79,8 +89,16 @@ switch ($action) {
 
         break;
     case "speak":
-        $text = filter_input(INPUT_GET, "text");
-        $command = escapeshellcmd('python main2.py ross3102 "' . $text . '"');
+        header("Content-Type", "application/json");
+        $text = filter_input(INPUT_POST, "text");
+        $name = filter_input(INPUT_POST, "name");
+
+        if (!file_exists('clips/' . $name)) {
+            $name = "ross3102";
+        }
+
+        $outfile = "out" . time() . ".mp3";
+        $command = escapeshellcmd('python main2.py ' . $name . ' "' . $text . '" "' . $outfile . '"');
         $output = shell_exec($command);
-        echo $output;
+        echo json_encode(array("outfile"=>$outfile, "name"=>$name));
 }

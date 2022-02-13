@@ -88,7 +88,6 @@ def main(clips_dir, username):
     sounds = phrase_to_sound(words)
     print(words.split())
 
-    print('eoifoweifj')
 
     out = AudioSegment.empty()
     ploc = 0
@@ -127,12 +126,10 @@ def main(clips_dir, username):
             ploc = loc
             out += AudioSegment.silent(40)
 
-        # play(out)
-
-        out.export(clips_dir + "/" + username + "/out.mp3")
+        out.export(clips_dir + "/" + username + "/" + sys.argv[3])
     except Exception as e:
         print(e)
 
 
 if __name__ == "__main__":
-    main("c:/Users/rzn31/projects/hackbeanpot/clips", sys.argv[1])
+    main("clips", sys.argv[1])

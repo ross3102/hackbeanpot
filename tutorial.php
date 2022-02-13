@@ -2,27 +2,41 @@
 
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
 <body>
+    <nav class="blue lighten-1">
+        <div class="nav-wrapper">
+            <div class="container">
+                <div class="brand-logo" style="font-family: 'Comfortaa'"><a href="./index.php">speakr</a></div>
+                <ul class="right">
+                    <li><a href="./index.php?action=tutorial">Voice Creator</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <main>
-        <div class="container" style="margin: 0 auto">
+        <div class="container" style="margin: 20px auto">
             <div class="row">
-                <div class="col s12 m6 offset-m3">
+                <div class="col s12 l6 offset-l3">
                     <div class="card white">
                         <div class="card-content center-align">
                             <span class="card-title">Record Sound</span>
-                            Listen to the following recording and replicate it as close as possible.
+                            Listen to the following recording and replicate it as close as possible.<br>
                             The phonetic sound in question is <?= $letter ?>
+
+                            <br>
+
                             <audio controls>
                                 <source src="clips/ross3102/<?= $file_name ?>" type="audio/mp3">
                                 Your browser does not support the audio element.
                             </audio>
 
-                            <br>
-
-                            <form action="./index.php" method="post">
+                            <form action="./index.php" method="post" style="margin: 10px 0">
                                 <input type="hidden" name="action" value="save_sound">
                                 <input type="hidden" name="completion" value="<?= $completion + 1 ?>">
                                 <audio id="player" controls></audio>
@@ -93,23 +107,33 @@
         .then(handleSuccess);
 
     submitButton.click(function() {
+        <?php if (!isset($name)): ?>
+            name = prompt("Enter your name");
+        <?php else: ?>
+            name = "<?= $name ?>"
+        <?php endif; ?>
+
         if (blob == null)
             return;
 
         console.log(blob)
 
+        var formData = new FormData();
+
+        formData.append("action", "save_sound");
+        formData.append("filename", "<?= $file_name ?>");
+        formData.append("name", name);
+        formData.append("sound", blob);
+
         $.ajax({
             type: 'POST',
             url: './index.php',
-            data: {
-                "action": "save_sound",
-                "sound": blob
-            },
+            data: formData,
             processData: false,
             contentType: false,
             success: function(data) {
                 console.log(data);
-                location.href = "./index.php?action=tutorial&completion=<?= $completion + 1 ?>"
+                location.href = "./index.php?action=tutorial&completion=<?= $completion + 1 ?>&name=" + name
             }
         });
     })
